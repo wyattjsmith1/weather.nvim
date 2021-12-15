@@ -11,10 +11,12 @@ result.table_deep_merge = function(a, b)
   end
 end
 
+-- Convert Kelvin to Celius
 result.k_to_c = function(k)
   return k - 273.15
 end
 
+-- Convert Kelvin to fahrenheit
 result.k_to_f = function(k)
   return ((result.k_to_c(k) * 9) / 5) + 32
 end

@@ -1,5 +1,9 @@
+-- A collection of other weather icons which can be used. To use one of these:
+-- require'weather'setup { weather_icons = require'weather.other_icons'.nerd_font }
 local result = {}
 
+-- NerdFonts: https://www.nerdfonts.com/
+-- NerdFonts has a surprisingly good number of weather icons.
 result.nerd_font = {
   day = {
     clear = '',

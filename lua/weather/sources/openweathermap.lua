@@ -4,6 +4,9 @@ local util = require'weather.util'
 
 local result = {}
 
+-- Does a raw call to openweathermap, returning a table with either:
+-- "success": table containing the parsed json response from https://openweathermap.org/api/one-call-api
+-- "failure": string with the error message
 result.get_raw = function(args)
   local response = curl.get {
     url = "https://api.openweathermap.org/data/2.5/onecall",
@@ -22,6 +25,7 @@ result.get_raw = function(args)
   }
 end
 
+-- Given the response, returns the icon that should be used.
 local function get_icon(owm, config)
   local id = owm.current.weather[1].id
   local val = config.openweathermap.weather_code_to_icons[id]
@@ -33,6 +37,7 @@ local function get_icon(owm, config)
   return icons[val] or val
 end
 
+-- Maps a owm object to a Weather object.
 local function map_to_weather(owm, config)
   if owm.success then
     local k = owm.success.current.temp
@@ -52,6 +57,7 @@ local function map_to_weather(owm, config)
   end
 end
 
+-- Gets a Weather object for owm (blocking)
 result.get = function(location, config)
   assert(config.openweathermap.app_id, "No app_id provided for openweathermap")
   local args = {
@@ -64,3 +70,4 @@ result.get = function(location, config)
 end
 
 return result
+

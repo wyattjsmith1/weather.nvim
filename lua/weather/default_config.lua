@@ -46,8 +46,15 @@ local function default_icons()
 end
 
 result.default = {
+  -- The OWM configuration.
   openweathermap = {
+    -- Your appid. This can be found at https://home.openweathermap.org/api_keys
     app_id = "",
+    -- A mapping of weather codes (https://openweathermap.org/weather-conditions) to icons. If the icon is a name in `weather_icons`,
+    -- then this acts as a pointer to that icon. If not found, this is a literal string
+    -- which will be used. For example:
+    -- [200] = 'rain_thunderstorm' => returns the icon in `weather_icons` with the name 'rain_thunderstorm'
+    -- [200] = 'It's rainy' => literally uses "It's rainy"
     weather_code_to_icons = {
       -- 2xx: Thunderstorms
       [200] = 'rain_thunderstorm',
@@ -113,11 +120,16 @@ result.default = {
       [804] = 'cloudy_cloudy',
     },
   },
+  -- The default cache duration in seconds. This is not an automatic refresh, you must manually call `get_default` again.
   cache_ttl = 15 * 60, -- 15 Minutes
+  -- The default weather source when calling get_default.
   default = "openweathermap",
+  -- The set of icons to use. See `day()` above for all names.
   weather_icons = default_icons(),
+  lualine = {
+    fetching_text = "Getting weather...",
+  }
 }
-
 
 return result
 
