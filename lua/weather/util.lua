@@ -11,4 +11,13 @@ result.table_deep_merge = function(a, b)
   end
 end
 
+result.k_to_c = function(k)
+  return k - 273.15
+end
+
+result.k_to_f = function(k)
+  return ((result.k_to_c(k) * 9) / 5) + 32
+end
+
 return result
+

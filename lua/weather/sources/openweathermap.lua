@@ -1,5 +1,6 @@
 local curl = require'plenary.curl'
 local os = require'os'
+local util = require'weather.util'
 
 local result = {}
 
@@ -8,9 +9,17 @@ result.get_raw = function(args)
     url = "https://api.openweathermap.org/data/2.5/onecall",
     query = args,
   }
-  assert(response.exit == 0 and response.status < 400 and response.status >= 200, "Failed to fetch weather: " .. response.body)
+  if response.exit ~= 0 or response.status > 400 or response.status < 200 then
+    return {
+      failure = {
+        message = response.body
+      }
+    }
+  end
   local response_table = vim.fn.json_decode(response.body)
-  return response_table
+  return {
+    success = response_table
+  }
 end
 
 local function get_icon(owm, config)
@@ -24,12 +33,23 @@ local function get_icon(owm, config)
   return icons[val] or val
 end
 
-result.map_to_weather = function(owm, config)
-  return {
-    temp = owm.current.temp,
-    humidity = owm.current.humidity,
-    condition_icon = get_icon(owm, config),
-  }
+local function map_to_weather(owm, config)
+  if owm.success then
+    local k = owm.success.current.temp
+    return {
+      success = {
+        temp = {
+          k = k,
+          c = util.k_to_c(k),
+          f = util.k_to_f(k),
+        },
+        humidity = owm.success.current.humidity,
+        condition_icon = get_icon(owm.success, config),
+      }
+    }
+  else
+    return owm
+  end
 end
 
 result.get = function(location, config)
@@ -39,7 +59,8 @@ result.get = function(location, config)
     lon = location.lon,
     appid = config.openweathermap.app_id,
   }
-  return result.map_to_weather(result.get_raw(args), config)
+  local weather = map_to_weather(result.get_raw(args), config)
+  return weather
 end
 
 return result

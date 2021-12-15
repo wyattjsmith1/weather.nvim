@@ -8,6 +8,10 @@ local os = require'os'
 local weather = {}
 local cache = nil
 
+local function is_cache_valid()
+  return cache and cache.updated < os.time() + config.cache_ttl and cache.item
+end
+
 weather.location_lookup = function()
   local response = curl.get{
     url = 'http://ip-api.com/json?fields=status,country,countryCode,region,regionName,city,zip,lat,lon',
@@ -25,25 +29,42 @@ weather.location_lookup = function()
 end
 
 weather.get_default_blocking = function(location)
-  if cache and cache.updated < os.time() + config.cache_ttl then
-    return cache.item
-  end
-
   location = location or weather.location_lookup()
   if config.default == 'openweathermap' then
     local result = owm.get(location, config)
-    cache = {
-      updated = os.time(),
-      item = result
-    }
     return result
   else
-    print("No default found")
+    print("No default weather found")
   end
 end
 
-weather.get_default = function(args, callback)
-  async.run(function() weather.get_default_blocking(args) end, callback)
+weather.get_cached = function()
+  if is_cache_valid() then
+    return cache.item
+  end
+end
+
+weather.get_default = function(location, callback)
+  if is_cache_valid() then
+    callback(cache.item)
+  elseif cache == nil then
+    cache = {
+      pending = { callback }
+    }
+    async.run(
+      function() return weather.get_default_blocking(location) end,
+      function(r)
+        cache.updated = os.time()
+        cache.item = r
+        for _,v in ipairs(cache.pending) do
+          v(r)
+        end
+        cache.pending = nil
+      end
+    )
+  else
+    table.insert(cache.pending, callback)
+  end
 end
 
 weather.setup = function(args)
