@@ -123,7 +123,39 @@ result.default = {
 ```
 
 ## Usage
-`weather.nvim` doesn't do anything on its own; it need to be called. The modules are documented below:
+`weather.nvim` doesn't do anything on its own; it need to be called. The modules are documented below.
+
+### Objects
+
+#### `Location`
+```
+{
+  country = "United States,
+  region = "California",
+  city = "New York City",
+  lat: 1234, -- latitude
+  lon: 4321, -- longitude
+}
+```
+
+#### `Weather`
+Weather will only contain either a `success` or a `failure`, never both.
+
+Please ignore the fact the numbers don't add up.
+```lua
+{
+  success = {
+    temp = {
+      k = 300 -- Temp in Kelvin,
+	  f = 100 -- Temp in F,
+	  c = 20 -- Temp in C,
+	},
+	humidity = 56, -- Humidity percentage
+	condition_icon = "Some string representing the weather. There is no obligation for this to be a single unicode character",
+  },
+  failure = "Some reason this went wrong as a string.",
+}
+```
 
 ### `require'weather'`
 | Function | Args | Returns | Notes |
@@ -173,3 +205,6 @@ require'weather'setup {
 }
 ```
 
+## Roadmap
+[ ] Alerts with [`nvim-notify`](https://github.com/rcarriga/nvim-notify).
+[ ] Exposing other information such as forcasts.
