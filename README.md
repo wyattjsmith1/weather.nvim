@@ -2,6 +2,8 @@
 
 A simple plugin to display weather in nvim.
 
+![screenshot](https://github.com/wyattjsmith1/weather.nvim/blob/main/assets/screenshot.png)
+
 ## Installation
 The usual ways. Packer below:
 
