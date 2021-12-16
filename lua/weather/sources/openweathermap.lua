@@ -80,7 +80,7 @@ end
 -- Gets a Weather object for owm
 result.get = function(location, config, callback)
   local app_id = get_app_id(config)
-  if app_id == "" then
+  if not app_id or app_id == "" then
     vim.notify("Could not find openweathermap app_id, which is required.", vim.log.levels.WARN)
   end
   local args = {
