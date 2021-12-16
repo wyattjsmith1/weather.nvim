@@ -170,12 +170,10 @@ Please ignore the fact the numbers don't add up.
 | Function | Args | Returns | Notes |
 | -------- | ---- | ------- | ----- | 
 | `location_lookup` | | `Location` | Looks up the user's location based on ip address. Uses `ip-api.com` |
-| `get_default_blocking` | `location` - a table with `{lat = x, lon = y}` for the location. If not provided, defaults to the result of `location_lookup`. | `Weather` | The method chosen is `config.default` |
-| `get_cached` | | `Weather?` | Gets the last cached `Weather`. May be `nil` if never fetched, or cache expired. |
-| `get_default` | `location` - Same as `get_default_blocking`<br>`callback` (`function(Weather)`) - A callback function. | Same as `get_default_blocking`, but runs async. `callback` is called when the results are fetched. |
+| `subscribe` | `id`: Any type that is unique. Used with `unsubscribe`<br>`callback`: A function accepting a `WeatherResult`| | Subscribes to all updates. `callback` may be called immediately with the last weather update if it exists. |
 
 ### 'require'weather.sources.openweathermap'`
-Provides direct access to Open Weather Map.
+Provides direct access to Open Weather Map. This is mostly internal, may not be updated.
 | Function | Args | Returns | Notes |
 | -------- | ---- | ------- | ----- |
 | `get_raw` | `args` (table) - The query parameters for `onecall` | A table with one value; either `"success" = (table with OWM result)` or `"failure" = (string with OWM result)`. | Does a raw fetch of OWM data. See documentation at https://openweathermap.org/api/one-call-api.
@@ -205,7 +203,7 @@ Then, tell lualine to add it to your configuration:
 require('lualine').setup {
   sections = {
     ...
-	lualine_a = { "require'weather.lualine'.custom(my_custom_formatter, '羽')" }
+	lualine_a = { "require'weather.lualine'.custom(my_custom_formatter, { pending = '羽', error = '' })" }
 	lualine_b = { "require'weather.lualine'.custom(my_custom_formatter)" }
     lualine_c = { default_f },
   }

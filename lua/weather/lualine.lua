@@ -1,4 +1,5 @@
 local weather = require'weather'
+local util = require'weather.util'
 
 local function default_f_formatter(data)
   return data.condition_icon .. "  " .. math.floor(data.temp.f) .. "°F"
@@ -21,28 +22,26 @@ local result = {}
 --    lualine_x = { custom(format) },
 --  }
 --}
-local is_pending = false
 
-result.custom = function(formatter, pending_text)
+result.custom = function(formatter, alt_icons)
+  local default_icons = {
+    pending = '⏳',
+    error = '❌',
+  }
+  util.table_deep_merge(default_icons, alt_icons)
+  local text = alt_icons.pending
+  weather.subscribe_to_default("lualine", function(update)
+    if update.error then
+      text = alt_icons.error
+    else
+      text = formatter(update.success)
+      vim.schedule(function() vim.api.nvim_command('redrawstatus') end)
+    end
+  end)
   return function()
-    local cached = weather.get_cached()
-    if cached then
-      local formatted = formatter(cached.success)
-      return formatted
-    end
-
-    if not is_pending then
-      is_pending = true
-      weather.get_default(nil, function(_)
-        -- Ignore result here because it should be picked up in the cache on redraw.
-        is_pending = false
-        vim.api.nvim_command('redrawstatus')
-      end)
-    end
-    return pending_text or "Fetching weather..."
+    return text
   end
 end
-
 
 result.default_f = function(pending)
   return result.custom(default_f_formatter, pending)

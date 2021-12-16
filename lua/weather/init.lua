@@ -8,11 +8,9 @@ local async = require'plenary.async'
 local os = require'os'
 
 local weather = {}
-local cache = nil
 
-local function is_cache_valid()
-  return (cache ~= nil) and (cache.updated or 0) < (os.time() + config.cache_ttl) and cache.item
-end
+local subscriptions = {}
+local timer = nil
 
 -- Looks up the current location, and returns information about it. This is done via ip address by ip-api.com.
 weather.location_lookup = function()
@@ -31,63 +29,48 @@ weather.location_lookup = function()
   }
 end
 
--- Looks up weather according to the default in the config file.
--- - location: a table with { lat: x, lon: x } for location. If not passed, uses `location_lookup`
-local function get_default_blocking(location)
-  location = location or weather.location_lookup()
+
+local last_update = nil
+-- Subscribes to weather updates.
+-- - id (any): A unique id to register the listener with. Must be used with `unsubscribe`
+-- - callback (function(WeatherResult)): A callback for when weather is fetched. May be called immediately if weather is cached already.
+weather.subscribe = function(id, callback)
+  assert(subscriptions[id] == nil, "Subscribed to weather updates with existing id: " .. id)
+  subscriptions[id] = callback
+  if last_update then
+    callback(last_update)
+  end
+end
+
+weather.unsubscribe = function(id)
+  table[id] = nil
+end
+
+local function update_weather()
+  local location = config.location or weather.location_lookup()
   if config.default == 'openweathermap' then
     local result = owm.get(location, config, function(data)
-      cache.item = data
-      cache.updated = os.time()
-      for k,v in pairs(cache.pending) do
+      last_update = data
+      for _,v in pairs(subscriptions) do
         v(data)
-        cache.pending[k] = nil
       end
     end)
     return result
   else
     print("No default weather found")
   end
+
 end
 
--- Gets cached weather. Either returns a Weather object, or nil.
-weather.get_cached = function()
-  if is_cache_valid() then
-    return cache.item
-  end
-end
-
---local function get_default_callback(location, callback)
---  callback(weather.get_default_blocking(location))
---end
-
---local get_default_coroutine = async.wrap(get_default_callback, 2)
---weather.get_default = function(location, callback)
---  a.run(get_default_coroutine, {location, callback})
---end
-weather.get_default_async = async.wrap(function(location, callback)
-  callback(weather.get_default_blocking(location))
-end, 2)
--- Gets weather from the default source async.
--- - location: same as get_default_blocking.
--- - callback: function(Weather)
-weather.get_default = function(location, callback)
-  if is_cache_valid() then
-    callback(cache.item)
-  elseif cache == nil then
-    cache = {
-      pending = { callback }
-    }
-    get_default_blocking(location)
-  else
-    table.insert(cache.pending, callback)
-  end
-end
-
--- Sets up the configuration.
+-- Sets up the configuration and begins fetching weather.
 weather.setup = function(args)
   -- Merge passed in args into the default config.
   util.table_deep_merge(args or {}, config)
+  update_weather()
+  if not timer then
+    timer = vim.loop.new_timer()
+    timer:start(config.update_interval, config.update_interval, update_weather)
+  end
 end
 
 return weather

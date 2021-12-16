@@ -46,6 +46,7 @@ local function default_icons()
 end
 
 result.default = {
+  update_interval = 15 * 60 * 1000, -- 15 Minutes in ms
   -- The OWM configuration.
   openweathermap = {
     -- Your appid. This can be found at https://home.openweathermap.org/api_keys
@@ -120,8 +121,6 @@ result.default = {
       [804] = 'cloudy_cloudy',
     },
   },
-  -- The default cache duration in seconds. This is not an automatic refresh, you must manually call `get_default` again.
-  cache_ttl = 15 * 60, -- 15 Minutes
   -- The default weather source when calling get_default.
   default = "openweathermap",
   -- The set of icons to use. See `day()` above for all names.
