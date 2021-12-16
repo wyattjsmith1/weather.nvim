@@ -100,9 +100,7 @@ result.default = {
       [804] = 'cloudy_cloudy',
     },
   },
-  -- The default cache duration in seconds. This is not an automatic refresh, you must manually call `get_default` again.
-  cache_ttl = 15 * 60, -- 15 Minutes
-  -- The default weather source when calling get_default.
+  -- The default weather source when calling subscribe.
   default = "openweathermap",
   -- The set of icons to use. See `day()` above for all names.
   weather_icons = {

@@ -30,7 +30,7 @@ result.custom = function(formatter, alt_icons)
   }
   util.table_deep_merge(default_icons, alt_icons)
   local text = alt_icons.pending
-  weather.subscribe_to_default("lualine", function(update)
+  weather.subscribe("lualine", function(update)
     if update.error then
       text = alt_icons.error
     else

@@ -121,7 +121,7 @@ result.default = {
       [804] = 'cloudy_cloudy',
     },
   },
-  -- The default weather source when calling get_default.
+  -- The default weather source when calling subscribe.
   default = "openweathermap",
   -- The set of icons to use. See `day()` above for all names.
   weather_icons = default_icons(),
