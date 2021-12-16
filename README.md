@@ -188,10 +188,8 @@ Provides direct access to Open Weather Map.
 ### A formatter
 You will be given a `Weather` object, and you will need to convert this to a `string`. For example, this will format like "{icon} 100 F".
 ```lua
-local function format()
-  return require'weather.lualine'.lualine(function(data)
-    return data.condition_icon .. " " .. math.floor(data.temp.f) .. "°F"
-  end)
+local function format(weather)
+  return data.condition_icon .. " " .. math.floor(data.temp.f) .. "°F"
 end
 ```
 Optionally, you can use one of the following built-in formatters (avaliable from `require'weather.lualine'`
@@ -207,7 +205,9 @@ Then, tell lualine to add it to your configuration:
 require('lualine').setup {
   sections = {
     ...
-    lualine_x = { format() },
+	lualine_a = { "require'weather.lualine'.custom(my_custom_formatter, '羽')" }
+	lualine_b = { "require'weather.lualine'.custom(my_custom_formatter)" }
+    lualine_c = { default_f },
   }
 }
 ```

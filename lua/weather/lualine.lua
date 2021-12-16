@@ -34,8 +34,8 @@ result.custom = function(formatter, pending_text)
     if not is_pending then
       is_pending = true
       weather.get_default(nil, function(_)
-        is_pending = false
         -- Ignore result here because it should be picked up in the cache on redraw.
+        is_pending = false
         vim.api.nvim_command('redrawstatus')
       end)
     end
@@ -44,8 +44,12 @@ result.custom = function(formatter, pending_text)
 end
 
 
-result.default_f = result.custom(default_f_formatter)
-result.default_c = result.custom(default_c_formatter)
+result.default_f = function(pending)
+  return result.custom(default_f_formatter, pending)
+end
+result.default_c = function(pending)
+  return result.custom(default_c_formatter, pending)
+end
 
 
 return result
