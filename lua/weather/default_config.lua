@@ -50,7 +50,7 @@ result.default = {
   -- The OWM configuration.
   openweathermap = {
     -- Your appid. This can be found at https://home.openweathermap.org/api_keys
-    app_id = "",
+    app_id = {},
     -- A mapping of weather codes (https://openweathermap.org/weather-conditions) to icons. If the icon is a name in `weather_icons`,
     -- then this acts as a pointer to that icon. If not found, this is a literal string
     -- which will be used. For example:

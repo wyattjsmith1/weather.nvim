@@ -4,6 +4,21 @@ local util = require'weather.util'
 
 local result = {}
 
+local function get_app_id(config)
+  local app_id = config.openweathermap.app_id
+  if type(app_id) == 'table' then
+    local var = os.getenv(app_id.var_name or "")
+    if var and var ~= "" then
+      return var
+    else
+      return app_id.value
+    end
+  else
+    vim.notify("openweathermap.app_id should no longer be a string, but a table", vim.log.levels.WARN)
+    return app_id
+  end
+end
+
 -- Does a raw call to openweathermap, returning a table with either:
 -- "success": table containing the parsed json response from https://openweathermap.org/api/one-call-api
 -- "failure": string with the error message
@@ -64,11 +79,14 @@ end
 
 -- Gets a Weather object for owm
 result.get = function(location, config, callback)
-  assert(config.openweathermap.app_id, "No app_id provided for openweathermap")
+  local app_id = get_app_id(config)
+  if app_id == "" then
+    vim.notify("Could not find openweathermap app_id, which is required.", vim.log.levels.WARN)
+  end
   local args = {
     lat = location.lat,
     lon = location.lon,
-    appid = config.openweathermap.app_id,
+    appid = app_id,
   }
   result.get_raw(args, function(r)
     callback(map_to_weather(r, config))
