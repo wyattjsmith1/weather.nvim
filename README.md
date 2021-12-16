@@ -8,13 +8,15 @@ The usual ways. Packer below:
 ```lua
 use {
   'wyattjsmith/weather.nvim'
+  requires = {
+    "nvim-lua/plenary.nvim",
+  }
 }
 ```
 
 ## Configuration
 ```lua
 require'weather'.setup {
-
 }
 ```
 
@@ -123,7 +125,7 @@ result.default = {
 ```
 
 ## Usage
-`weather.nvim` doesn't do anything on its own; it need to be called. The modules are documented below.
+`weather.nvim` doesn't do anything on its own; it need to be called. The modules and example usage with lualine are documented below.
 
 ### Objects
 
@@ -138,23 +140,28 @@ result.default = {
 }
 ```
 
-#### `Weather`
-Weather will only contain either a `success` or a `failure`, never both.
+#### `WeatherResult`
+`WeatherResult` will only contain either a `success` or a `failure`, never both.
 
 Please ignore the fact the numbers don't add up.
 ```lua
 {
-  success = {
-    temp = {
-      k = 300 -- Temp in Kelvin,
-	  f = 100 -- Temp in F,
-	  c = 20 -- Temp in C,
-	},
-	humidity = 56, -- Humidity percentage
-	condition_icon = "Some string representing the weather. There is no obligation for this to be a single unicode character",
-  },
+  success = Weather,
   failure = "Some reason this went wrong as a string.",
 }
+```
+
+#### `Weather`
+```lua
+{
+  temp = {
+    k = 300 -- Temp in Kelvin,
+    f = 100 -- Temp in F,
+    c = 20 -- Temp in C,
+  },
+  humidity = 56, -- Humidity percentage
+  condition_icon = "Some string representing the weather. There is no obligation for this to be a single unicode character",
+},
 ```
 
 ### `require'weather'`
@@ -185,6 +192,12 @@ local function format()
   end)
 end
 ```
+Optionally, you can use one of the following built-in formatters (avaliable from `require'weather.lualine'`
+
+| Name | Example |
+| ---- | ------- |
+| `default_f` | "{icon}  100°F" |
+| `default_c` | "{icon}  45°C" |
 
 ### Add to configuration
 Then, tell lualine to add it to your configuration:
@@ -198,12 +211,23 @@ require('lualine').setup {
 ```
 
 ## Customizing
-To customize the icons, you can update `config.weather_icons`. Optionally, there is `weather.other_icons` which you can use to setup nerdfonts:
+There are two layers of abstraction for converting weather results to icons. First, the weather source returns the name of an icon. See `config.openweathermap.weather_code_to_icons` for an example of what this looks like.
+
+After that, the icon is looked up in `config.weather_icons.{day/night}`. If the returned icon id is not found in this, the text is used literally.
+
+So, if you want to change how OWM renders condition code 771 (Squall), you can update `config.openweathermap.weather_code_to_icons` either to be another icon id listed in `config.weather_icons`, or a specific icon that you want.
+
+If you want to update the way all `'snow'` results look, update `config.weather_icons.{day/night}.snow` to be the icon you want.
+
+The "icons" above are not limited to a single unicode/asci character/emoji, but are any string you want. You could have `config.weather_icons.day.clear = "Tis a beautiful day today I shal have a picnic"`. I mean, you can, but that's ridiculous.
+
+Optionally, there is `weather.other_icons` which you can use to setup nerdfonts:
 ```lua
 require'weather'setup { 
-  weather_icons = require'weather.other_icons'.nerd_font 
+  weather_icons = require'weather.other_icons'.nerd_font
 }
 ```
+Additional icon groups are welcome.
 
 ## Roadmap
 [ ] Alerts with [`nvim-notify`](https://github.com/rcarriga/nvim-notify).

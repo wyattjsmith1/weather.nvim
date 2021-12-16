@@ -126,9 +126,6 @@ result.default = {
   default = "openweathermap",
   -- The set of icons to use. See `day()` above for all names.
   weather_icons = default_icons(),
-  lualine = {
-    fetching_text = "Getting weather...",
-  }
 }
 
 return result
