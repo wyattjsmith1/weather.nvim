@@ -13,21 +13,25 @@ local subscriptions = {}
 local timer = nil
 
 -- Looks up the current location, and returns information about it. This is done via ip address by ip-api.com.
-weather.location_lookup = function()
-  local response = curl.get{
+weather.location_lookup = function(callback)
+  curl.get{
     url = 'http://ip-api.com/json?fields=status,country,countryCode,region,regionName,city,zip,lat,lon',
+    callback = function(response)
+      vim.schedule(function()
+        assert(response.exit == 0 and response.status < 400 and response.status >= 200, "Failed to fetch location")
+        local response_table = vim.fn.json_decode(response.body)
+        assert(response_table.status == "success")
+        callback {
+          country = response_table.country,
+          region = response_table.regionName,
+          city = response_table.city,
+          lat = response_table.lat,
+          lon = response_table.lon,
+        }
+      end)
+    end
   }
-  assert(response.exit == 0 and response.status < 400 and response.status >= 200, "Failed to fetch location")
-  local response_table = vim.fn.json_decode(response.body)
-  assert(response_table.status == "success")
-  return {
-    country = response_table.country,
-    region = response_table.regionName,
-    city = response_table.city,
-    lat = response_table.lat,
-    lon = response_table.lon,
-  }
-end
+  end
 
 
 local last_update = nil
@@ -46,8 +50,7 @@ weather.unsubscribe = function(id)
   table[id] = nil
 end
 
-local function update_weather()
-  local location = config.location or weather.location_lookup()
+local function get_weather_with_location(location)
   if config.default == 'openweathermap' then
     local result = owm.get(location, config, function(data)
       last_update = data
@@ -62,14 +65,21 @@ local function update_weather()
 
 end
 
+local function update_weather()
+  if config.location then
+    get_weather_with_location(config.location)
+  else
+    weather.location_lookup(get_weather_with_location)
+  end
+end
+
 -- Sets up the configuration and begins fetching weather.
 weather.setup = function(args)
   -- Merge passed in args into the default config.
   util.table_deep_merge(args or {}, config)
-  update_weather()
   if not timer then
     timer = vim.loop.new_timer()
-    timer:start(config.update_interval, config.update_interval, update_weather)
+    timer:start(0, config.update_interval, function() update_weather() end)
   end
 end
 
