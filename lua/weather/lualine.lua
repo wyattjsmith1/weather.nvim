@@ -21,28 +21,25 @@ local result = {}
 --    lualine_x = { custom(format) },
 --  }
 --}
+local is_pending = false
 
-result.custom = function(formatter)
+result.custom = function(formatter, pending_text)
   return function()
-    print'Calling weather lualine'
     local cached = weather.get_cached()
-    print("found cached item:")
-    print(cached)
     if cached then
-      print'found cached'
       local formatted = formatter(cached.success)
       return formatted
     end
 
-    print("Getting from lualine")
-    weather.get_default(nil, function(_)
-      print("got weather")
-      -- Ignore result here because it should be picked up in the cache on redraw.
-      vim.api.nvim_command('redrawstatus')
-      print'requested redraw'
-    end)
-    print'returning default fetching text'
-    return weather.config.lualine.fetching_text
+    if not is_pending then
+      is_pending = true
+      weather.get_default(nil, function(_)
+        is_pending = false
+        -- Ignore result here because it should be picked up in the cache on redraw.
+        vim.api.nvim_command('redrawstatus')
+      end)
+    end
+    return pending_text or "Fetching weather..."
   end
 end
 

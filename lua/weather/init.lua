@@ -11,11 +11,6 @@ local weather = {}
 local cache = nil
 
 local function is_cache_valid()
-  print(cache)
-  if cache ~= nil then
-    print(cache.updated)
-    print(cache.item)
-  end
   return (cache ~= nil) and (cache.updated or 0) < (os.time() + config.cache_ttl) and cache.item
 end
 
@@ -38,11 +33,17 @@ end
 
 -- Looks up weather according to the default in the config file.
 -- - location: a table with { lat: x, lon: x } for location. If not passed, uses `location_lookup`
-weather.get_default_blocking = function(location)
-  print'Fetching weather'
+local function get_default_blocking(location)
   location = location or weather.location_lookup()
   if config.default == 'openweathermap' then
-    local result = owm.get(location, config)
+    local result = owm.get(location, config, function(data)
+      cache.item = data
+      cache.updated = os.time()
+      for k,v in pairs(cache.pending) do
+        v(data)
+        cache.pending[k] = nil
+      end
+    end)
     return result
   else
     print("No default weather found")
@@ -77,32 +78,10 @@ weather.get_default = function(location, callback)
     cache = {
       pending = { callback }
     }
-    print("Starting async task")
-    async.void(function(l)
-      local r = weather.get_default_blocking(l)
-      cache.updated = os.time()
-      cache.item = r
-      for _,v in ipairs(cache.pending) do
-        v(r)
-      end
-      cache.pending = {}
-    end)(location)
-    --async.run(
-    --  function() print("running in async") return weather.get_default_blocking(location) end,
-    --  function(r)
-    --    print("callback")
-    --    cache.updated = os.time()
-    --    cache.item = r
-    --    for _,v in ipairs(cache.pending) do
-    --      v(r)
-    --    end
-    --    cache.pending = nil
-    --  end
-    --)
+    get_default_blocking(location)
   else
     table.insert(cache.pending, callback)
   end
-  print("end get weather")
 end
 
 -- Sets up the configuration.

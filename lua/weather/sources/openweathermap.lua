@@ -7,21 +7,25 @@ local result = {}
 -- Does a raw call to openweathermap, returning a table with either:
 -- "success": table containing the parsed json response from https://openweathermap.org/api/one-call-api
 -- "failure": string with the error message
-result.get_raw = function(args)
-  local response = curl.get {
+result.get_raw = function(args, callback)
+  curl.get {
     url = "https://api.openweathermap.org/data/2.5/onecall",
     query = args,
-  }
-  if response.exit ~= 0 or response.status > 400 or response.status < 200 then
-    return {
-      failure = {
-        message = response.body
-      }
-    }
-  end
-  local response_table = vim.fn.json_decode(response.body)
-  return {
-    success = response_table
+    callback = function(response)
+      if response.exit ~= 0 or response.status > 400 or response.status < 200 then
+        callback {
+          failure = {
+            message = response.body
+          }
+        }
+      end
+      vim.schedule(function()
+        local response_table = vim.fn.json_decode(response.body)
+        callback {
+          success = response_table
+        }
+      end)
+    end,
   }
 end
 
@@ -57,16 +61,17 @@ local function map_to_weather(owm, config)
   end
 end
 
--- Gets a Weather object for owm (blocking)
-result.get = function(location, config)
+-- Gets a Weather object for owm
+result.get = function(location, config, callback)
   assert(config.openweathermap.app_id, "No app_id provided for openweathermap")
   local args = {
     lat = location.lat,
     lon = location.lon,
     appid = config.openweathermap.app_id,
   }
-  local weather = map_to_weather(result.get_raw(args), config)
-  return weather
+  result.get_raw(args, function(r)
+    callback(map_to_weather(r, config))
+  end)
 end
 
 return result
