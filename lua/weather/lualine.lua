@@ -31,12 +31,12 @@ result.custom = function(formatter, alt_icons)
   util.table_deep_merge(default_icons, alt_icons)
   local text = alt_icons.pending
   weather.subscribe("lualine", function(update)
-    if update.error then
+    if update.failure then
       text = alt_icons.error
     else
       text = formatter(update.success)
-      vim.schedule(function() vim.api.nvim_command('redrawstatus') end)
     end
+    vim.schedule(function() vim.api.nvim_command('redrawstatus') end)
   end)
   return function()
     return text

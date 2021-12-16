@@ -18,6 +18,7 @@ result.get_raw = function(args, callback)
             message = response.body
           }
         }
+        return
       end
       vim.schedule(function()
         local response_table = vim.fn.json_decode(response.body)

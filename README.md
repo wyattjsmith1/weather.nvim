@@ -9,7 +9,7 @@ The usual ways. Packer below:
 
 ```lua
 use {
-  'wyattjsmith/weather.nvim'
+  'wyattjsmith1/weather.nvim'
   requires = {
     "nvim-lua/plenary.nvim",
   }
