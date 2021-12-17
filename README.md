@@ -177,17 +177,17 @@ Please ignore the fact the numbers don't add up.
 ```
 
 ### `require'weather'`
-| Function | Args | Returns | Notes |
-| -------- | ---- | ------- | ----- | 
-| `location_lookup` | `callback` A callback accepting a `Location` | | Looks up the user's location based on ip address. Uses `ip-api.com` |
-| `subscribe` | `id`: Any type that is unique. Used with `unsubscribe`<br>`callback`: A function accepting a `WeatherResult`| | Subscribes to all updates. `callback` may be called immediately with the last weather update if it exists. |
+| Function | Args | Notes |
+| -------- | ---- | ----- | 
+| `location_lookup` | `callback` A callback accepting a `Location` | Looks up the user's location based on ip address. Uses `ip-api.com` |
+| `subscribe` | `id`: Any type that is unique. Used with `unsubscribe`<br>`callback`: A function accepting a `WeatherResult`| Subscribes to all updates. `callback` may be called immediately with the last weather update if it exists. |
 
 ### 'require'weather.sources.openweathermap'`
 Provides direct access to Open Weather Map. This is mostly internal, may not be updated.
-| Function | Args | Returns | Notes |
-| -------- | ---- | ------- | ----- |
-| `get_raw` | `args` (table) - The query parameters for `onecall`<br>`callback` a function accepting the `onecall` result as a table. | | Does a raw fetch of OWM data. See documentation at https://openweathermap.org/api/one-call-api.
-| `get` | `location` (`Location`)<br>`config` - The configuration<br>`callback` a function accepting a `WeatherResult`  |  | Fetches weather from OWM and returns it as a `Weather`. |
+| Function | Args | Notes |
+| -------- | ---- | ----- |
+| `get_raw` | `args` (table) - The query parameters for `onecall`<br>`callback` a function accepting the `onecall` result as a table. | Does a raw fetch of OWM data. See documentation at https://openweathermap.org/api/one-call-api.
+| `get` | `location` (`Location`)<br>`config` - The configuration<br>`callback` a function accepting a `WeatherResult`  | Fetches weather from OWM and returns it as a `Weather`. |
 
 
 ## Integration with [`lualine`](https://github.com/nvim-lualine/lualine.nvim)
