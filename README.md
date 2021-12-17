@@ -38,7 +38,7 @@ result.default = {
 	-- If the value at `var_name` is empty, falls back to `app_id`.
     app_id = {
       var_name = "SOME_ENV_VAR",
-	  app_id = "my app id from openweathermap",
+	  value = "my app id from openweathermap",
 	},
     -- A mapping of weather codes (https://openweathermap.org/weather-conditions) to icons. If the icon is a name in `weather_icons`,
     -- then this acts as a pointer to that icon. If not found, this is a literal string
