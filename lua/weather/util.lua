@@ -21,5 +21,20 @@ result.k_to_f = function(k)
   return ((result.k_to_c(k) * 9) / 5) + 32
 end
 
+-- Borrowed from http://lua-users.org/wiki/StringRecipes
+result.wrap_text = function(str, limit, indent, indent1)
+   indent = indent or ""
+   indent1 = indent1 or indent
+   limit = limit or 72
+   local here = 1-#indent1
+   local function check(_, st, word, fi)
+      if fi - here > limit then
+         here = st - #indent
+         return "\n"..indent..word
+      end
+   end
+   return indent1..str:gsub("(%s+)()(%S+)()", check)
+end
+
 return result
 

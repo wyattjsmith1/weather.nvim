@@ -4,6 +4,12 @@ A simple plugin to display weather in nvim.
 
 ![screenshot](https://github.com/wyattjsmith1/weather.nvim/blob/main/assets/screenshot.png)
 
+lualine integration
+
+![screenshot](https://github.com/wyattjsmith1/weather.nvim/blob/main/assets/notification.png)
+
+nvim-notify integration
+
 ## Installation
 The usual ways. Packer below:
 
@@ -211,6 +217,22 @@ require('lualine').setup {
   }
 }
 ```
+
+### Alerts with Alerts are possible by calling:
+```lua
+require'weather.notify'.start()
+```
+
+`start` takes the following optional arguments in order:
+1. `text_wrap` (number) Controls the max width of the message, defaults to 70.
+2. `notify_level` (string) `nvim-notify`'s level. Defaults to `"error"`
+3. `notify_opts` (table) Additional opts to forward to `nvim-notify.notify`.
+
+For the nicest results, it is recommended to install [`nvim-notify`](https://github.com/rcarriga/nvim-notify) and set it to your default notification (copied from `nvim-notify` readme):
+```lua
+vim.notify = require("notify")
+```
+
 
 ## Customizing
 There are two layers of abstraction for converting weather results to icons. First, the weather source returns the name of an icon. See `config.openweathermap.weather_code_to_icons` for an example of what this looks like.
