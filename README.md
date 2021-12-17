@@ -220,7 +220,8 @@ require('lualine').setup {
 }
 ```
 
-### Alerts with Alerts are possible by calling:
+### Alerts 
+Alerts are possible by calling:
 ```lua
 require'weather.notify'.start()
 ```
