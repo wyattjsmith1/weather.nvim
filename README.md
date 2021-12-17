@@ -182,7 +182,7 @@ Please ignore the fact the numbers don't add up.
 | `location_lookup` | `callback` A callback accepting a `Location` | Looks up the user's location based on ip address. Uses `ip-api.com` |
 | `subscribe` | `id`: Any type that is unique. Used with `unsubscribe`<br>`callback`: A function accepting a `WeatherResult`| Subscribes to all updates. `callback` may be called immediately with the last weather update if it exists. |
 
-### 'require'weather.sources.openweathermap'`
+### `require'weather.sources.openweathermap'`
 Provides direct access to Open Weather Map. This is mostly internal, may not be updated.
 | Function | Args | Notes |
 | -------- | ---- | ----- |
