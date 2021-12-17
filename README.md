@@ -254,5 +254,5 @@ require'weather'setup {
 Additional icon groups are welcome.
 
 ## Roadmap
-[ ] Alerts with [`nvim-notify`](https://github.com/rcarriga/nvim-notify).
-[ ] Exposing other information such as forcasts.
+- [x] Alerts with [`nvim-notify`](https://github.com/rcarriga/nvim-notify).
+- [ ] Exposing other information such as forcasts.
