@@ -61,15 +61,7 @@ end
 local function map_to_weather(owm, config)
   if owm.success then
     local k = owm.success.current.temp
-    local alerts = {{
-      from = "Fake Weather Service",
-      title = "Test Weather Alert",
-      description = "This is a sample weather alert to make sure alerts are working.",
-    }, {
-      from = "Fake Weather Service",
-      title = "Test Weather Alert",
-      description = "This is a different sample weather alert to make sure alerts are working.",
-    }}
+    local alerts = {}
     for _,a in ipairs(owm.success.alerts or {}) do
       table.insert(alerts, {
         from = a.sender_name,
