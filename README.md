@@ -200,7 +200,7 @@ local function format(weather)
   return data.condition_icon .. " " .. math.floor(data.temp.f) .. "°F"
 end
 ```
-Optionally, you can use one of the following built-in formatters (avaliable from `require'weather.lualine'`
+Optionally, you can use one of the following built-in formatters (avaliable from `require'weather.lualine'`). Both of these take a single, optional argument with `pending` and `error` keys which display a string for the respective cases.
 
 | Name | Example |
 | ---- | ------- |
@@ -215,7 +215,7 @@ require('lualine').setup {
     ...
 	lualine_a = { "require'weather.lualine'.custom(my_custom_formatter, { pending = '羽', error = '' })" }
 	lualine_b = { "require'weather.lualine'.custom(my_custom_formatter)" }
-    lualine_c = { default_f },
+    lualine_c = { default_f() },
   }
 }
 ```
