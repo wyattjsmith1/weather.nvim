@@ -4,8 +4,6 @@ local curl = require'plenary.curl'
 local owm = require'weather.sources.openweathermap'
 local config = require'weather.default_config'.default
 local util = require'weather.util'
-local async = require'plenary.async'
-local os = require'os'
 
 local weather = {}
 
@@ -18,15 +16,23 @@ weather.location_lookup = function(callback)
     url = 'http://ip-api.com/json?fields=status,country,countryCode,region,regionName,city,zip,lat,lon',
     callback = function(response)
       vim.schedule(function()
-        assert(response.exit == 0 and response.status < 400 and response.status >= 200, "Failed to fetch location")
+        if response.exit ~= 0 or response.status >= 400 or response.status < 200 then
+          callback {
+            failure = {
+              message = response.body,
+            }
+          }
+          return
+        end
         local response_table = vim.fn.json_decode(response.body)
-        assert(response_table.status == "success")
         callback {
-          country = response_table.country,
-          region = response_table.regionName,
-          city = response_table.city,
-          lat = response_table.lat,
-          lon = response_table.lon,
+          success = {
+            country = response_table.country,
+            region = response_table.regionName,
+            city = response_table.city,
+            lat = response_table.lat,
+            lon = response_table.lon,
+          }
         }
       end)
     end
@@ -69,7 +75,16 @@ local function update_weather()
   if config.location then
     get_weather_with_location(config.location)
   else
-    weather.location_lookup(get_weather_with_location)
+    weather.location_lookup(
+    function(location_response)
+      if location_response.success then
+        get_weather_with_location(location_response.success)
+      else
+        for _,s in pairs(subscriptions) do
+          s(location_response)
+        end
+      end
+    end)
   end
 end
 
