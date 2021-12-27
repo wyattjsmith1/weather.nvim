@@ -140,13 +140,17 @@ result.default = {
 ### Objects
 
 #### `Location`
+Will contain only one of the keys.
 ```
-{
+success = {
   country = "United States,
   region = "California",
   city = "New York City",
   lat: 1234, -- latitude
   lon: 4321, -- longitude
+}
+failure = {
+  message = "Error message",
 }
 ```
 

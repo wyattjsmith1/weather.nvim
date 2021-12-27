@@ -10,7 +10,7 @@ result.start = function(text_wrap, notify_level, notify_opts)
     icon = "⚠️",
   }
   weather.subscribe('notify', function(w)
-    if result.failure then
+    if w.failure then
       return
     end
 
