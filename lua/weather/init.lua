@@ -12,32 +12,41 @@ local timer = nil
 
 -- Looks up the current location, and returns information about it. This is done via ip address by ip-api.com.
 weather.location_lookup = function(callback)
-  curl.get{
-    url = 'http://ip-api.com/json?fields=status,country,countryCode,region,regionName,city,zip,lat,lon',
-    callback = function(response)
-      vim.schedule(function()
-        if response.exit ~= 0 or response.status >= 400 or response.status < 200 then
+  local curl_result = pcall(function()
+    curl.get{
+      url = 'http://ip-api.com/json?fields=status,country,countryCode,region,regionName,city,zip,lat,lon',
+      callback = function(response)
+        vim.schedule(function()
+          if response.exit ~= 0 or response.status >= 400 or response.status < 200 then
+            callback {
+              failure = {
+                message = response.body,
+              }
+            }
+            return
+          end
+          local response_table = vim.fn.json_decode(response.body)
           callback {
-            failure = {
-              message = response.body,
+            success = {
+              country = response_table.country,
+              region = response_table.regionName,
+              city = response_table.city,
+              lat = response_table.lat,
+              lon = response_table.lon,
             }
           }
-          return
-        end
-        local response_table = vim.fn.json_decode(response.body)
-        callback {
-          success = {
-            country = response_table.country,
-            region = response_table.regionName,
-            city = response_table.city,
-            lat = response_table.lat,
-            lon = response_table.lon,
-          }
-        }
-      end)
-    end
-  }
+        end)
+      end,
+    }
+  end)
+  if not curl_result then
+    callback {
+      failure = {
+        message = "curl failed"
+      }
+    }
   end
+end
 
 
 local last_update = nil
